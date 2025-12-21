@@ -1,0 +1,53 @@
+############################
+# General
+############################
+*.log
+*.tmp
+*.cache
+*.user
+*.suo
+*.swp
+*.DS_Store
+
+############################
+# .NET / Backend
+############################
+**/bin/
+**/obj/
+project.assets.json
+elms.sln
+.vs/
+*.pdb
+
+############################
+# Entity Framework
+############################
+**/Migrations/**
+
+############################
+# Node / Angular Frontend
+############################
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.cache/
+
+############################
+# Angular build artifacts
+############################
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/.env.production
+
+############################
+# Editor / IDE
+############################
+.vscode/
+.idea/
+*.iml
+
+############################
+# OS specific
+############################
+Thumbs.db

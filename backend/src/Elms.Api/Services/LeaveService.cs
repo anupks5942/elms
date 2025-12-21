@@ -73,6 +73,7 @@ namespace Elms.Api.Services
                 .Select(lr => new LeaveResponseDto
                 {
                     Id = lr.Id,
+                    LeaveId = lr.Id,
                     EmployeeId = lr.EmployeeId,
                     EmployeeName = lr.Employee!.Name,
                     StartDate = lr.StartDate,
@@ -93,6 +94,7 @@ namespace Elms.Api.Services
                 .Select(lr => new LeaveResponseDto
                 {
                     Id = lr.Id,
+                    LeaveId = lr.Id,
                     EmployeeId = lr.EmployeeId,
                     EmployeeName = lr.Employee!.Name,
                     StartDate = lr.StartDate,
