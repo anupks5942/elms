@@ -4,6 +4,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatIconModule } from '@angular/material/icon';
 import { LeaveService } from '../../core/services/leave.service';
 import { LeaveRequest } from '../../core/models/leave-request.model';
 
@@ -14,7 +16,9 @@ import { LeaveRequest } from '../../core/models/leave-request.model';
     CommonModule,
     MatCardModule,
     MatTableModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatChipsModule,
+    MatIconModule
   ],
   template: `
     <mat-card>
@@ -27,13 +31,13 @@ import { LeaveRequest } from '../../core/models/leave-request.model';
             <!-- Start Date Column -->
             <ng-container matColumnDef="startDate">
               <th mat-header-cell *matHeaderCellDef> Start Date </th>
-              <td mat-cell *matCellDef="let element"> {{element.startDate}} </td>
+              <td mat-cell *matCellDef="let element"> {{element.startDate | date:'mediumDate'}} </td>
             </ng-container>
 
             <!-- End Date Column -->
             <ng-container matColumnDef="endDate">
               <th mat-header-cell *matHeaderCellDef> End Date </th>
-              <td mat-cell *matCellDef="let element"> {{element.endDate}} </td>
+              <td mat-cell *matCellDef="let element"> {{element.endDate | date:'mediumDate'}} </td>
             </ng-container>
 
             <!-- Total Days Column -->
@@ -46,14 +50,20 @@ import { LeaveRequest } from '../../core/models/leave-request.model';
             <ng-container matColumnDef="status">
               <th mat-header-cell *matHeaderCellDef> Status </th>
               <td mat-cell *matCellDef="let element">
-                <span [class]="'status-' + element.status.toLowerCase()">{{element.status}}</span>
+                <mat-chip-set>
+                  <mat-chip
+                    [color]="getStatusColor(element.status)"
+                    [disabled]="true">
+                    {{element.status}}
+                  </mat-chip>
+                </mat-chip-set>
               </td>
             </ng-container>
 
             <!-- Applied Date Column -->
             <ng-container matColumnDef="appliedDate">
               <th mat-header-cell *matHeaderCellDef> Applied Date </th>
-              <td mat-cell *matCellDef="let element"> {{element.appliedDate}} </td>
+              <td mat-cell *matCellDef="let element"> {{element.appliedDate | date:'mediumDate'}} </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -68,7 +78,8 @@ import { LeaveRequest } from '../../core/models/leave-request.model';
         </mat-progress-bar>
         
         <div *ngIf="!loading && leaveRequests.length === 0" class="no-data">
-          No leave requests found.
+          <mat-icon>event_busy</mat-icon>
+          <p>No leave requests found.</p>
         </div>
       </mat-card-content>
     </mat-card>
@@ -101,6 +112,9 @@ import { LeaveRequest } from '../../core/models/leave-request.model';
       text-align: center;
       padding: 20px;
       color: #777;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
   `]
 })
@@ -142,6 +156,19 @@ export class MyLeavesComponent implements OnInit {
             this.loading = false;
           }
         });
+    }
+  }
+
+  getStatusColor(status: string): string {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'warning';
+      case 'approved':
+        return 'accent';
+      case 'rejected':
+        return 'warn';
+      default:
+        return 'primary';
     }
   }
 }

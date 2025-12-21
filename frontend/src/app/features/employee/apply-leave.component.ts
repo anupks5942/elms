@@ -31,31 +31,45 @@ import { Employee } from '../../core/models/employee.model';
         <form [formGroup]="leaveForm" (ngSubmit)="onSubmit()">
           <mat-form-field appearance="fill" class="full-width">
             <mat-label>Start Date</mat-label>
-            <input 
-              matInput 
-              [matDatepicker]="startDatePicker" 
-              formControlName="startDate" 
-              placeholder="Choose start date">
+            <input
+              matInput
+              [matDatepicker]="startDatePicker"
+              formControlName="startDate"
+              placeholder="Choose start date"
+              (dateChange)="onDateChange()">
             <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
             <mat-datepicker #startDatePicker></mat-datepicker>
           </mat-form-field>
 
           <mat-form-field appearance="fill" class="full-width">
             <mat-label>End Date</mat-label>
-            <input 
-              matInput 
-              [matDatepicker]="endDatePicker" 
-              formControlName="endDate" 
-              placeholder="Choose end date">
+            <input
+              matInput
+              [matDatepicker]="endDatePicker"
+              formControlName="endDate"
+              placeholder="Choose end date"
+              (dateChange)="onDateChange()">
             <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
             <mat-datepicker #endDatePicker></mat-datepicker>
           </mat-form-field>
 
+          <!-- Summary Card -->
+          <mat-card class="summary-card" *ngIf="totalDays > 0">
+            <mat-card-header>
+              <mat-card-title>Leave Summary</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <p>Total Days: <strong>{{ totalDays }}</strong></p>
+              <p>From: <strong>{{ leaveForm.value.startDate | date:'mediumDate' }}</strong></p>
+              <p>To: <strong>{{ leaveForm.value.endDate | date:'mediumDate' }}</strong></p>
+            </mat-card-content>
+          </mat-card>
+
           <div class="button-container">
-            <button 
-              mat-raised-button 
-              color="primary" 
-              type="submit" 
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
               [disabled]="leaveForm.invalid">
               Submit Leave Request
             </button>
@@ -75,7 +89,12 @@ import { Employee } from '../../core/models/employee.model';
       justify-content: flex-end;
       margin-top: 20px;
     }
-    
+
+    .summary-card {
+      margin: 20px 0;
+      background-color: #f5f5f5;
+    }
+
     mat-card {
       max-width: 600px;
       margin: 0 auto;
@@ -85,6 +104,7 @@ import { Employee } from '../../core/models/employee.model';
 export class ApplyLeaveComponent implements OnInit {
   leaveForm: FormGroup;
   currentUser: Employee | null = null;
+  totalDays: number = 0;
 
   constructor(
     private fb: FormBuilder,
@@ -125,7 +145,7 @@ export class ApplyLeaveComponent implements OnInit {
   onSubmit() {
     if (this.leaveForm.valid && this.currentUser) {
       const { startDate, endDate } = this.leaveForm.value;
-      
+
       // Format dates to ISO string
       const formattedStartDate = new Date(startDate).toISOString().split('T')[0];
       const formattedEndDate = new Date(endDate).toISOString().split('T')[0];
@@ -138,6 +158,7 @@ export class ApplyLeaveComponent implements OnInit {
               panelClass: ['success-snackbar']
             });
             this.leaveForm.reset();
+            this.totalDays = 0; // Reset total days
           },
           error: (error) => {
             this.snackBar.open(`Error: ${error.message}`, 'Close', {
@@ -146,6 +167,22 @@ export class ApplyLeaveComponent implements OnInit {
             });
           }
         });
+    }
+  }
+
+  onDateChange() {
+    const startDate = this.leaveForm.get('startDate')?.value;
+    const endDate = this.leaveForm.get('endDate')?.value;
+
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      // Calculate total days (inclusive of start and end dates)
+      const timeDifference = end.getTime() - start.getTime();
+      this.totalDays = Math.floor(timeDifference / (1000 * 3600 * 24)) + 1;
+    } else {
+      this.totalDays = 0;
     }
   }
 }

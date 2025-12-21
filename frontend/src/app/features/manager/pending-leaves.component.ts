@@ -5,6 +5,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatIconModule } from '@angular/material/icon';
 import { LeaveService } from '../../core/services/leave.service';
 import { LeaveRequest } from '../../core/models/leave-request.model';
 
@@ -16,7 +18,9 @@ import { LeaveRequest } from '../../core/models/leave-request.model';
     MatCardModule,
     MatTableModule,
     MatButtonModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatChipsModule,
+    MatIconModule
   ],
   template: `
     <mat-card>
@@ -26,22 +30,22 @@ import { LeaveRequest } from '../../core/models/leave-request.model';
       <mat-card-content>
         <div class="table-container">
           <table mat-table [dataSource]="pendingLeaves" class="mat-elevation-z8">
-            <!-- Employee ID Column -->
-            <ng-container matColumnDef="employeeId">
-              <th mat-header-cell *matHeaderCellDef> Employee ID </th>
-              <td mat-cell *matCellDef="let element"> {{element.employeeId}} </td>
+            <!-- Employee Name Column -->
+            <ng-container matColumnDef="employeeName">
+              <th mat-header-cell *matHeaderCellDef> Employee Name </th>
+              <td mat-cell *matCellDef="let element"> {{element.employeeName}} </td>
             </ng-container>
 
             <!-- Start Date Column -->
             <ng-container matColumnDef="startDate">
               <th mat-header-cell *matHeaderCellDef> Start Date </th>
-              <td mat-cell *matCellDef="let element"> {{element.startDate}} </td>
+              <td mat-cell *matCellDef="let element"> {{element.startDate | date:'mediumDate'}} </td>
             </ng-container>
 
             <!-- End Date Column -->
             <ng-container matColumnDef="endDate">
               <th mat-header-cell *matHeaderCellDef> End Date </th>
-              <td mat-cell *matCellDef="let element"> {{element.endDate}} </td>
+              <td mat-cell *matCellDef="let element"> {{element.endDate | date:'mediumDate'}} </td>
             </ng-container>
 
             <!-- Total Days Column -->
@@ -53,23 +57,37 @@ import { LeaveRequest } from '../../core/models/leave-request.model';
             <!-- Applied Date Column -->
             <ng-container matColumnDef="appliedDate">
               <th mat-header-cell *matHeaderCellDef> Applied Date </th>
-              <td mat-cell *matCellDef="let element"> {{element.appliedDate}} </td>
+              <td mat-cell *matCellDef="let element"> {{element.appliedDate | date:'mediumDate'}} </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef> Status </th>
+              <td mat-cell *matCellDef="let element">
+                <mat-chip-set>
+                  <mat-chip
+                    [color]="getStatusColor(element.status)"
+                    [disabled]="true">
+                    {{element.status}}
+                  </mat-chip>
+                </mat-chip-set>
+              </td>
             </ng-container>
 
             <!-- Actions Column -->
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef> Actions </th>
               <td mat-cell *matCellDef="let element">
-                <button 
-                  mat-raised-button 
-                  color="primary" 
+                <button
+                  mat-raised-button
+                  color="primary"
                   (click)="approveLeave(element.id)"
                   class="action-button">
                   Approve
                 </button>
-                <button 
-                  mat-raised-button 
-                  color="warn" 
+                <button
+                  mat-raised-button
+                  color="warn"
                   (click)="rejectLeave(element.id)"
                   class="action-button">
                   Reject
@@ -89,7 +107,8 @@ import { LeaveRequest } from '../../core/models/leave-request.model';
         </mat-progress-bar>
         
         <div *ngIf="!loading && pendingLeaves.length === 0" class="no-data">
-          No pending leave requests.
+          <mat-icon>event_busy</mat-icon>
+          <p>No pending leave requests.</p>
         </div>
       </mat-card-content>
     </mat-card>
@@ -98,25 +117,28 @@ import { LeaveRequest } from '../../core/models/leave-request.model';
     table {
       width: 100%;
     }
-    
+
     .table-container {
       overflow-x: auto;
     }
-    
+
     .action-button {
       margin-right: 8px;
     }
-    
+
     .no-data {
       text-align: center;
       padding: 20px;
       color: #777;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
   `]
 })
 export class PendingLeavesComponent implements OnInit {
   pendingLeaves: LeaveRequest[] = [];
-  displayedColumns: string[] = ['employeeId', 'startDate', 'endDate', 'totalDays', 'appliedDate', 'actions'];
+  displayedColumns: string[] = ['employeeName', 'startDate', 'endDate', 'totalDays', 'appliedDate', 'status', 'actions'];
   loading = true;
 
   constructor(
@@ -147,42 +169,59 @@ export class PendingLeavesComponent implements OnInit {
   }
 
   approveLeave(leaveId: number) {
-    this.leaveService.approveLeave(leaveId)
-      .subscribe({
-        next: () => {
-          this.snackBar.open('Leave request approved successfully!', 'Close', {
-            duration: 3000,
-            panelClass: ['success-snackbar']
-          });
-          // Remove the approved leave from the list
-          this.pendingLeaves = this.pendingLeaves.filter(leave => leave.id !== leaveId);
-        },
-        error: (error) => {
-          this.snackBar.open(`Error approving leave: ${error.message}`, 'Close', {
-            duration: 5000,
-            panelClass: ['error-snackbar']
-          });
-        }
-      });
+    if (confirm('Are you sure you want to approve this leave request?')) {
+      this.leaveService.approveLeave(leaveId)
+        .subscribe({
+          next: () => {
+            this.snackBar.open('Leave request approved successfully!', 'Close', {
+              duration: 3000,
+              panelClass: ['success-snackbar']
+            });
+            // Remove the approved leave from the list
+            this.pendingLeaves = this.pendingLeaves.filter(leave => leave.id !== leaveId);
+          },
+          error: (error) => {
+            this.snackBar.open(`Error approving leave: ${error.message}`, 'Close', {
+              duration: 5000,
+              panelClass: ['error-snackbar']
+            });
+          }
+        });
+    }
   }
 
   rejectLeave(leaveId: number) {
-    this.leaveService.rejectLeave(leaveId)
-      .subscribe({
-        next: () => {
-          this.snackBar.open('Leave request rejected successfully!', 'Close', {
-            duration: 3000,
-            panelClass: ['success-snackbar']
-          });
-          // Remove the rejected leave from the list
-          this.pendingLeaves = this.pendingLeaves.filter(leave => leave.id !== leaveId);
-        },
-        error: (error) => {
-          this.snackBar.open(`Error rejecting leave: ${error.message}`, 'Close', {
-            duration: 5000,
-            panelClass: ['error-snackbar']
-          });
-        }
-      });
+    if (confirm('Are you sure you want to reject this leave request?')) {
+      this.leaveService.rejectLeave(leaveId)
+        .subscribe({
+          next: () => {
+            this.snackBar.open('Leave request rejected successfully!', 'Close', {
+              duration: 3000,
+              panelClass: ['success-snackbar']
+            });
+            // Remove the rejected leave from the list
+            this.pendingLeaves = this.pendingLeaves.filter(leave => leave.id !== leaveId);
+          },
+          error: (error) => {
+            this.snackBar.open(`Error rejecting leave: ${error.message}`, 'Close', {
+              duration: 5000,
+              panelClass: ['error-snackbar']
+            });
+          }
+        });
+    }
+  }
+
+  getStatusColor(status: string): string {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'warning';
+      case 'approved':
+        return 'accent';
+      case 'rejected':
+        return 'warn';
+      default:
+        return 'primary';
+    }
   }
 }

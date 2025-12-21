@@ -79,7 +79,8 @@ namespace Elms.Api.Services
                     StartDate = lr.StartDate,
                     EndDate = lr.EndDate,
                     TotalDays = lr.TotalDays,
-                    Status = lr.Status.ToString()
+                    Status = lr.Status.ToString(),
+                    AppliedDate = lr.AppliedDate
                 })
                 .ToListAsync();
 
@@ -100,7 +101,8 @@ namespace Elms.Api.Services
                     StartDate = lr.StartDate,
                     EndDate = lr.EndDate,
                     TotalDays = lr.TotalDays,
-                    Status = lr.Status.ToString()
+                    Status = lr.Status.ToString(),
+                    AppliedDate = lr.AppliedDate
                 })
                 .ToListAsync();
 

@@ -24,6 +24,7 @@ namespace Elms.Api.Dtos
         public DateTime EndDate { get; set; }
         public int TotalDays { get; set; }
         public string Status { get; set; } = string.Empty;
+        public DateTime AppliedDate { get; set; }
     }
     
     public class UpdateLeaveStatusDto

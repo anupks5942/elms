@@ -6,4 +6,5 @@ export interface LeaveRequest {
   totalDays: number;
   status: 'Pending' | 'Approved' | 'Rejected';
   appliedDate: string; // ISO date string
+  employeeName: string;
 }

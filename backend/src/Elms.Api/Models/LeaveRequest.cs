@@ -24,6 +24,8 @@ namespace Elms.Api.Models
         
         public LeaveStatus Status { get; set; } = LeaveStatus.Pending;
         
+        public DateTime AppliedDate { get; set; } = DateTime.Now;
+        
         public int TotalDays => CalculateTotalDays();
         
         private int CalculateTotalDays()
