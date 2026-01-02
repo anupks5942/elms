@@ -39,7 +39,7 @@ ng serve
 
 ## Configuration
 
-The application connects to the backend API at `http://localhost:5000/api`. This can be modified in the environment files:
+The application connects to the backend API at `http://localhost:52767/api`. This can be modified in the environment files:
 
 - `src/environments/environment.ts`
 - `src/environments/environment.development.ts`

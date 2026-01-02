@@ -36,29 +36,41 @@ import { Employee } from './core/models/employee.model';
         [mode]="isScreenSmall() ? 'over' : 'side'"
         [opened]="!isScreenSmall()"
         [disableClose]="!isScreenSmall()">
+        <div class="sidenav-header">
+          <h2>ELMS</h2>
+        </div>
         <mat-nav-list>
-          <a mat-list-item routerLink="/my-leaves" (click)="sidenav.close()">My Leaves</a>
-          <a mat-list-item routerLink="/apply-leave" (click)="sidenav.close()">Apply Leave</a>
+          <a mat-list-item routerLink="/my-leaves" (click)="sidenav.close()" class="nav-item">
+            <mat-icon matListItemIcon>calendar_month</mat-icon>
+            <span matListItemTitle>My Leaves</span>
+          </a>
+          <a mat-list-item routerLink="/apply-leave" (click)="sidenav.close()" class="nav-item">
+            <mat-icon matListItemIcon>edit_note</mat-icon>
+            <span matListItemTitle>Apply Leave</span>
+          </a>
           <a mat-list-item
              routerLink="/pending-requests"
              (click)="sidenav.close()"
-             *ngIf="currentUser?.role === 'Manager'">
-             Pending Requests
+             *ngIf="currentUser?.role === 'Manager'"
+             class="nav-item">
+             <mat-icon matListItemIcon>pending_actions</mat-icon>
+             <span matListItemTitle>Pending Requests</span>
           </a>
         </mat-nav-list>
       </mat-sidenav>
 
       <mat-sidenav-content>
-        <mat-toolbar color="primary">
+        <mat-toolbar color="primary" class="app-toolbar">
           <button
             type="button"
             aria-label="Toggle sidenav"
             mat-icon-button
             (click)="sidenav.toggle()"
-            *ngIf="isScreenSmall()">
+            *ngIf="isScreenSmall()"
+            class="sidenav-toggle">
             <mat-icon>menu</mat-icon>
           </button>
-          <span>Employee Leave Management System</span>
+          <span class="toolbar-title">Employee Leave Management System</span>
           <span class="spacer"></span>
           <app-user-switch (userChanged)="onUserChanged($event)"></app-user-switch>
         </mat-toolbar>
@@ -75,15 +87,52 @@ import { Employee } from './core/models/employee.model';
     }
 
     .sidenav {
-      width: 250px;
+      width: 280px;
+      box-shadow: 3px 0 10px rgba(0,0,0,0.1);
     }
 
-    .sidenav .mat-toolbar {
-      background: inherit;
+    .sidenav-header {
+      padding: 24px 16px 20px 16px;
+      border-bottom: 1px solid var(--border-color);
+      text-align: center;
+    }
+
+    .sidenav-header h2 {
+      margin: 0;
+      color: var(--primary-color);
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+
+    .nav-item {
+      border-radius: 0 24px 24px 0;
+      margin: 4px 8px;
+    }
+
+    .nav-item:hover {
+      background-color: rgba(25, 118, 210, 0.08);
+    }
+
+    .nav-item.active {
+      background-color: rgba(25, 118, 210, 0.15);
+    }
+
+    .app-toolbar {
+      padding: 0 16px;
+      box-shadow: 0 2px 4px -1px rgba(0,0,0,0.1);
+    }
+
+    .toolbar-title {
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+
+    .sidenav-toggle {
+      margin-right: 16px;
     }
 
     .container {
-      padding: 20px;
+      padding: 24px;
     }
 
     .spacer {

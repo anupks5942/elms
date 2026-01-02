@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon';
 import { LeaveService } from '../../core/services/leave.service';
 import { Employee } from '../../core/models/employee.model';
 
@@ -20,48 +21,66 @@ import { Employee } from '../../core/models/employee.model';
     MatInputModule,
     MatButtonModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatIconModule
   ],
   template: `
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Apply for Leave</mat-card-title>
+    <mat-card class="apply-leave-card">
+      <mat-card-header class="card-header">
+        <mat-card-title class="card-title">Apply for Leave</mat-card-title>
+        <mat-card-subtitle class="card-subtitle">Plan your time off in advance</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <form [formGroup]="leaveForm" (ngSubmit)="onSubmit()">
-          <mat-form-field appearance="fill" class="full-width">
-            <mat-label>Start Date</mat-label>
-            <input
-              matInput
-              [matDatepicker]="startDatePicker"
-              formControlName="startDate"
-              placeholder="Choose start date"
-              (dateChange)="onDateChange()">
-            <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
-            <mat-datepicker #startDatePicker></mat-datepicker>
-          </mat-form-field>
+        <form [formGroup]="leaveForm" (ngSubmit)="onSubmit()" class="leave-form">
+          <div class="date-fields">
+            <mat-form-field appearance="outline" class="date-field">
+              <mat-label>Start Date</mat-label>
+              <input
+                matInput
+                [matDatepicker]="startDatePicker"
+                formControlName="startDate"
+                placeholder="Choose start date"
+                (dateChange)="onDateChange()">
+              <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #startDatePicker></mat-datepicker>
+              <mat-error *ngIf="leaveForm.get('startDate')?.invalid">Start date is required</mat-error>
+            </mat-form-field>
 
-          <mat-form-field appearance="fill" class="full-width">
-            <mat-label>End Date</mat-label>
-            <input
-              matInput
-              [matDatepicker]="endDatePicker"
-              formControlName="endDate"
-              placeholder="Choose end date"
-              (dateChange)="onDateChange()">
-            <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
-            <mat-datepicker #endDatePicker></mat-datepicker>
-          </mat-form-field>
+            <mat-form-field appearance="outline" class="date-field">
+              <mat-label>End Date</mat-label>
+              <input
+                matInput
+                [matDatepicker]="endDatePicker"
+                formControlName="endDate"
+                placeholder="Choose end date"
+                (dateChange)="onDateChange()">
+              <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #endDatePicker></mat-datepicker>
+              <mat-error *ngIf="leaveForm.get('endDate')?.invalid">End date is required</mat-error>
+              <mat-error *ngIf="leaveForm.hasError('dateRangeInvalid')">End date must be after start date</mat-error>
+            </mat-form-field>
+          </div>
 
           <!-- Summary Card -->
           <mat-card class="summary-card" *ngIf="totalDays > 0">
             <mat-card-header>
-              <mat-card-title>Leave Summary</mat-card-title>
+              <mat-card-title class="summary-title">Leave Summary</mat-card-title>
             </mat-card-header>
             <mat-card-content>
-              <p>Total Days: <strong>{{ totalDays }}</strong></p>
-              <p>From: <strong>{{ leaveForm.value.startDate | date:'mediumDate' }}</strong></p>
-              <p>To: <strong>{{ leaveForm.value.endDate | date:'mediumDate' }}</strong></p>
+              <div class="summary-details">
+                <div class="summary-item">
+                  <span class="label">Total Days:</span>
+                  <span class="value">{{ totalDays }}</span>
+                </div>
+                <div class="summary-item">
+                  <span class="label">From:</span>
+                  <span class="value">{{ leaveForm.value.startDate | date:'mediumDate' }}</span>
+                </div>
+                <div class="summary-item">
+                  <span class="label">To:</span>
+                  <span class="value">{{ leaveForm.value.endDate | date:'mediumDate' }}</span>
+                </div>
+              </div>
             </mat-card-content>
           </mat-card>
 
@@ -70,7 +89,9 @@ import { Employee } from '../../core/models/employee.model';
               mat-raised-button
               color="primary"
               type="submit"
-              [disabled]="leaveForm.invalid">
+              [disabled]="leaveForm.invalid"
+              class="submit-button">
+              <mat-icon>send</mat-icon>
               Submit Leave Request
             </button>
           </div>
@@ -79,25 +100,102 @@ import { Employee } from '../../core/models/employee.model';
     </mat-card>
   `,
   styles: [`
-    .full-width {
-      width: 100%;
-      margin-bottom: 16px;
+    .apply-leave-card {
+      max-width: 700px;
+      margin: 0 auto;
+      overflow: hidden;
     }
-    
-    .button-container {
+
+    .card-header {
+      text-align: center;
+      padding: 24px 24px 16px 24px;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      color: white;
+    }
+
+    .card-title {
+      color: white;
+      font-size: 1.75rem;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .card-subtitle {
+      color: rgba(255, 255, 255, 0.85);
+      margin-top: 8px;
+    }
+
+    .leave-form {
+      padding: 24px;
+    }
+
+    .date-fields {
       display: flex;
-      justify-content: flex-end;
-      margin-top: 20px;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .date-field {
+      flex: 1;
     }
 
     .summary-card {
-      margin: 20px 0;
-      background-color: #f5f5f5;
+      margin: 24px 0;
+      background-color: #f9f9f9;
+      border-left: 4px solid var(--primary-color);
     }
 
-    mat-card {
-      max-width: 600px;
-      margin: 0 auto;
+    .summary-title {
+      color: var(--primary-color);
+      font-weight: 500;
+    }
+
+    .summary-details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .summary-item {
+      display: flex;
+      flex-direction: column;
+      min-width: 120px;
+    }
+
+    .label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .value {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 16px;
+    }
+
+    .submit-button {
+      padding: 12px 24px;
+      font-weight: 500;
+      box-shadow: 0 4px 6px rgba(25, 118, 210, 0.2);
+    }
+
+    .submit-button:hover {
+      box-shadow: 0 6px 8px rgba(25, 118, 210, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .date-fields {
+        flex-direction: column;
+        gap: 0;
+      }
     }
   `]
 })

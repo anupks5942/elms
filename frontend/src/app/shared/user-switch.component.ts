@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Employee } from '../core/models/employee.model';
 
@@ -14,18 +15,25 @@ import { Employee } from '../core/models/employee.model';
     MatSelectModule,
     MatFormFieldModule,
     MatButtonModule,
+    MatIconModule,
     FormsModule,
     ReactiveFormsModule
   ],
   template: `
-    <mat-form-field appearance="fill">
+    <mat-form-field class="user-switch-field" appearance="outline">
       <mat-label>Act As User</mat-label>
-      <select matNativeControl (change)="onUserChange($event)" [(ngModel)]="selectedUserId">
-        <option value="" disabled>Select a user</option>
-        <option *ngFor="let user of users" [value]="user.id">
-          {{ user.name }} ({{ user.role }})
-        </option>
-      </select>
+      <mat-select [(ngModel)]="selectedUserId" (selectionChange)="onUserChange($event)">
+        <mat-option value="" disabled>Select a user</mat-option>
+        <mat-option *ngFor="let user of users" [value]="user.id.toString()">
+          <div class="user-option">
+            <mat-icon class="user-icon">account_circle</mat-icon>
+            <div class="user-info">
+              <span class="user-name">{{ user.name }}</span>
+              <span class="user-role">{{ user.role }}</span>
+            </div>
+          </div>
+        </mat-option>
+      </mat-select>
     </mat-form-field>
   `,
   styles: [`
@@ -33,9 +41,40 @@ import { Employee } from '../core/models/employee.model';
       display: block;
       margin-right: 20px;
     }
-    
-    mat-form-field {
-      width: 200px;
+
+    .user-switch-field {
+      width: 220px;
+    }
+
+    .user-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-icon {
+      color: var(--primary-color);
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-name {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .user-role {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 599px) {
+      .user-switch-field {
+        width: 180px;
+      }
     }
   `]
 })
