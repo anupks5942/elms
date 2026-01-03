@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Elms.Api": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:52766;http://localhost:52767"
+    }
+  }
+}

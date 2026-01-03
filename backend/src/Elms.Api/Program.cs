@@ -17,15 +17,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Configure CORS to allow requests from Angular frontend
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngular",
-        policy =>
-        {
-            policy
-                .WithOrigins("http://localhost:4200")
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-        });
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
 });
+
 
 // Add custom services
 builder.Services.AddScoped<ILeaveService, LeaveService>();
@@ -42,7 +42,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseCors("AllowAngular");
 app.UseAuthorization();
 app.MapControllers();
